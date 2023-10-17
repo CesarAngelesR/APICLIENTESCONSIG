@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Consignatario</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js"></script>
+
+</head>
+<body>
+<div class="container">
+    <div>
+        <table id="myTable" class="table table-striped" style="width:100%">
+        </table>
+    </div>
+    <div>
+        <div class="col-md-12">
+            <h3 class="form-label">Alta Consignatario</h3>
+        </div>
+        <form id="basic-form" class="row g-3 needs-validation">
+            <div class="col-md-6">
+                <label for="validation01" class="form-label">Id Consignatario</label>
+                <input type="text" class="form-control" id="validation01" placeholder="1" required>
+                <div class="invalid-feedback">
+                    El campo es requerido.
+                </div>
+            </div>
+            <div class="col-md-6">
+                <label for="validation02" class="form-label">Id Cliente</label>
+                <input type="text" class="form-control" id="validation02" placeholder="1" required>
+                <div class="invalid-feedback">
+                    El campo es requerido.
+                </div>
+            </div>
+            <div class="col-md-6">
+                <label for="validation03" class="form-label">Activo</label>
+                <input type="text" class="form-control" id="validation03" placeholder="True" required>
+                <div class="invalid-feedback">
+                    El campo es requerido.
+                </div>
+            </div>
+            <div class="col-md-6">
+                <label for="validation04" class="form-label">Nombre</label>
+                <input type="text" class="form-control" id="validation04" placeholder="Nombre completo" required>
+                <div class="valid-feedback">
+                    Looks good!
+                </div>
+                <div class="invalid-feedback">
+                    El campo es requerido.
+                </div>
+            </div>
+            <div class="col-12">
+                <input type="submit" id="btnSeccion" class="btn btn-primary" value="Guardar Registro"/>
+            </div>
+        </form>
+    </div>
+
+
+</div>
+<script>
+    function getData() {
+        $.get("http://localhost:8080/crud/consignatario", function (da, status) {
+            let val = [];
+            da.forEach((element) => {
+                let array = [];
+                array.push(element.consignatarioid);
+                array.push(element.clienteid);
+                array.push(element.consignatarioactivo);
+                array.push(element.consignatarionombre);
+                array.push(element.consignatariofechacreacion);
+                array.push(element.consignatariofechamodificacion);
+                val.push(array);
+            });
+            new DataTable('#myTable', {
+                data: val,
+                columns: [
+                    {title: 'Id Consignatario'},
+                    {title: 'Id Cliente'},
+                    {title: 'Activo'},
+                    {title: 'Nombre'},
+                    {title: 'Fecha Alta'},
+                    {title: 'Fecha modifica'}
+                ]
+            });
+        });
+    }
+
+    $(document).ready(function () {
+        getData();
+        $("#basic-form").validate({
+            submitHandler: function(form){
+                console.log(form)
+                let data = {
+                    consignatarioid: $("#validation01").val(),
+                    clienteid: $("#validation02").val(),
+                    consignatarioactivo: $("#validation03").val(),
+                    consignatarionombre: $("#validation04").val()
+                };
+                $.ajax({
+                    type: "POST",
+                    url: 'http://localhost:8080/crud/consignatario',
+                    dataType: "json",
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        getData();
+                        alert("El registro se almaceno correctamente");
+                    },
+                    error: function (data, status) {
+                        if (data.status === 201) {
+                            getData();
+                            alert("El registro se almaceno correctamente");
+                        } else
+                            alert(status + " - No se pudo almacenar el registro: \n" + data);
+                    }
+                });
+            }
+        });
+        /*$("#btnSeccion").click(function (event) {
+
+            console.log(data)
+            $.ajax({
+
+            });
+        });*/
+    });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Clientes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <div>
+        <table id="myTable" class="table table-striped" style="width:100%">
+        </table>
+    </div>
+    <div>
+        <div class="col-md-12">
+            <h3 class="form-label">Alta Cliente</h3>
+        </div>
+        <form class="row g-3 needs-validation">
+            <div class="col-md-6">
+                <label for="validationCustom01" class="form-label">Activo</label>
+                <input type="text" class="form-control" id="validationCustom01" placeholder="True" required>
+                <div class="invalid-feedback">
+                    El campo es requerido.
+                </div>
+            </div>
+            <div class="col-md-6">
+                <label for="validationCustom02" class="form-label">Nombre</label>
+                <input type="text" class="form-control" id="validationCustom02" placeholder="Nombre completo" required>
+                <div class="valid-feedback">
+                    Looks good!
+                </div>
+                <div class="invalid-feedback">
+                    El campo es requerido.
+                </div>
+            </div>
+            <div class="col-12">
+                <input type="button" id="btnSeccion" class="btn btn-primary" value="Guardar Registro"/>
+            </div>
+        </form>
+    </div>
+
+
+</div>
+<script>
+    function getData() {
+        $.get("http://localhost:8099/crud/cliente", function (da, status) {
+            let val = [];
+            da.forEach((element) => {
+                let array = [];
+                array.push(element.clienteid);
+                array.push(element.clienteactivo);
+                array.push(element.clientenombre);
+                array.push(element.clientefechacreacion);
+                array.push(element.clientefechamodificacion);
+                val.push(array);
+            });
+            new DataTable('#myTable', {
+                data: val,
+                columns: [
+                    {title: 'Id Cliente'},
+                    {title: 'Activo'},
+                    {title: 'Nombre'},
+                    {title: 'Fecha Alta'},
+                    {title: 'Fecha modifica'}
+                ]
+            });
+        });
+    }
+
+    $(document).ready(function () {
+        getData();
+        $("#btnSeccion").click(function (event) {
+            console.log(event)
+            let data = {clienteactivo: $("#validationCustom01").val(), clientenombre: $("#validationCustom02").val()};
+            console.log(data);
+            $.ajax({
+                type: "POST",
+                url: 'http://localhost:8099/crud/cliente',
+                dataType: "json",
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    alert("El registro se almaceno correctamente");
+                },
+                error: function (data, status) {
+                    if (data.status === 201) {
+                        alert("El registro se almaceno correctamente");
+                    } else
+                        alert(status + " - No se pudo almacenar el registro: \n" + data);
+                }
+            });
+        });
+    });
+
+</script>
+</body>
+</html>
